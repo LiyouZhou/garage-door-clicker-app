@@ -54,13 +54,21 @@ def base_topic_arg(s):
 BASE_TOPIC_DEFAULT = "homie/"
 
 def env_loader():
-    return main(broker_host     = environ.get("BROKER_HOST"),
-                broker_port     = int(environ.get("BROKER_PORT")),
-                broker_username = environ.get("BROKER_USERNAME"),
-                broker_password = environ.get("BROKER_PASSWORD"),
-                base_topic      = base_topic_arg(environ.get("BASE_TOPIC", BASE_TOPIC_DEFAULT)),
-                device_id       = environ.get("DEVICE_ID"))
+    abort_flag = False
+    for env_name in ["BROKER_HOST", "BROKER_PORT", "BROKER_USERNAME", "BROKER_PASSWORD", "DEVICE_ID"]:
+        if not environ.get(env_name):
+            print("No environmental variable", env_name)
+            abort_flag = True
 
+    if not abort_flag:
+        main(broker_host     = environ.get("BROKER_HOST"),
+             broker_port     = int(environ.get("BROKER_PORT")),
+             broker_username = environ.get("BROKER_USERNAME"),
+             broker_password = environ.get("BROKER_PASSWORD"),
+             base_topic      = base_topic_arg(environ.get("BASE_TOPIC", BASE_TOPIC_DEFAULT)),
+             device_id       = environ.get("DEVICE_ID"))
+    else:
+        print("Cannot find all requirement environmental variables, aborting.")
 
 if __name__ == '__main__':
     import argparse
